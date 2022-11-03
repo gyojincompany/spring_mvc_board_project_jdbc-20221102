@@ -283,198 +283,262 @@ public class BoardDao {
 		
 	}
 	
-	public void delete(String bid) {
+	public void delete(final String bid) {
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;		
+		String sql = "DELETE FROM mvc_board WHERE bid=?";
 		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "DELETE FROM mvc_board WHERE bid=?";
+		this.template.update(sql, new PreparedStatementSetter() {
 			
-			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
-			
-			pstmt.setString(1, bid);
-			//sql 문 완성
-			
-			pstmt.executeUpdate();//완성된 SQL문 실행
-						
+			@Override
+			public void setValues(PreparedStatement pstmt) throws SQLException {
+				// TODO Auto-generated method stub
 				
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {				
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				pstmt.setString(1, bid);
+				
 			}
-		}
+		});
+		
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;		
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "DELETE FROM mvc_board WHERE bid=?";
+//			
+//			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
+//			
+//			pstmt.setString(1, bid);
+//			//sql 문 완성
+//			
+//			pstmt.executeUpdate();//완성된 SQL문 실행
+//						
+//				
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} finally {
+//			try {				
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				}
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		
 	}
 	
-	public void upHit(String bid) {
+	public void upHit(final String bid) {
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;		
+		String sql = "UPDATE mvc_board SET bhit=bhit+1 WHERE bid=?";
 		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "UPDATE mvc_board SET bhit=bhit+1 WHERE bid=?";
+		this.template.update(sql, new PreparedStatementSetter() {
 			
-			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
-			
-			pstmt.setString(1, bid);
-			//sql 문 완성
-			
-			pstmt.executeUpdate();//완성된 SQL문 실행
-						
-				
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {				
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			@Override
+			public void setValues(PreparedStatement pstmt) throws SQLException {
+				// TODO Auto-generated method stub
+				pstmt.setString(1, bid);
 			}
-		}
+		});
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;		
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "UPDATE mvc_board SET bhit=bhit+1 WHERE bid=?";
+//			
+//			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
+//			
+//			pstmt.setString(1, bid);
+//			//sql 문 완성
+//			
+//			pstmt.executeUpdate();//완성된 SQL문 실행
+//						
+//				
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} finally {
+//			try {				
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				}
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		
 	}
 	
 	public int board_count() {
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
+		String sql = "SELECT * FROM mvc_board";
 		
-		int count = 0;
+		ArrayList<BoardDto> dtos = (ArrayList<BoardDto>) template.query(sql, new BeanPropertyRowMapper(BoardDto.class));
 		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "SELECT * FROM mvc_board";
-			//게시글 번호의 내림차순 정렬(최근글이 가장 위에 오도록 함)
-			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
-			rs = pstmt.executeQuery();//SQL을 실행하여 결과값을 반환
-			
-			while(rs.next()) {
-				count = count + 1;
-			}				
-				
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if(rs != null) {
-					rs.close();
-				}
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		int count = dtos.size();
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		ResultSet rs = null;
+//		
+//		int count = 0;
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "SELECT * FROM mvc_board";
+//			//게시글 번호의 내림차순 정렬(최근글이 가장 위에 오도록 함)
+//			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
+//			rs = pstmt.executeQuery();//SQL을 실행하여 결과값을 반환
+//			
+//			while(rs.next()) {
+//				count = count + 1;
+//			}				
+//				
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if(rs != null) {
+//					rs.close();
+//				}
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				}
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		
 		return count;
 		
 	}
 	
-	public void reply(String bid, String bname, String btitle, String bcontent, String bgroup, String bstep, String bindent) {
+	public void reply(final String bid, final String bname, final String btitle, final String bcontent, final String bgroup, final String bstep, final String bindent) {
 		
 		reply_sort(bgroup, bstep);
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;		
-		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "INSERT INTO mvc_board(bid, bname, btitle, bcontent, bhit, bgroup, bstep, bindent) VALUES (MVC_BOARD_SEQ.nextval, ?, ?, ?, 0, ?, ?, ?)";
+		this.template.update(new PreparedStatementCreator() {
 			
-			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
-			
-			pstmt.setString(1, bname);
-			pstmt.setString(2, btitle);
-			pstmt.setString(3, bcontent);
-			pstmt.setString(4, bgroup);
-			pstmt.setInt(5, Integer.parseInt(bstep)+1);
-			pstmt.setInt(6, Integer.parseInt(bindent)+1);
-			
-			//sql 문 완성
-			
-			pstmt.executeUpdate();//완성된 SQL문 실행
-						
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+				// TODO Auto-generated method stub
+				String sql = "INSERT INTO mvc_board(bid, bname, btitle, bcontent, bhit, bgroup, bstep, bindent) VALUES (MVC_BOARD_SEQ.nextval, ?, ?, ?, 0, ?, ?, ?)";
+				PreparedStatement pstmt = con.prepareStatement(sql);
 				
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {				
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				pstmt.setString(1, bname);
+				pstmt.setString(2, btitle);
+				pstmt.setString(3, bcontent);
+				pstmt.setString(4, bgroup);
+				pstmt.setInt(5, Integer.parseInt(bstep)+1);
+				pstmt.setInt(6, Integer.parseInt(bindent)+1);			
+				
+				return pstmt;
 			}
-		}
+		});
+		
+		
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;		
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "INSERT INTO mvc_board(bid, bname, btitle, bcontent, bhit, bgroup, bstep, bindent) VALUES (MVC_BOARD_SEQ.nextval, ?, ?, ?, 0, ?, ?, ?)";
+//			
+//			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
+//			
+//			pstmt.setString(1, bname);
+//			pstmt.setString(2, btitle);
+//			pstmt.setString(3, bcontent);
+//			pstmt.setString(4, bgroup);
+//			pstmt.setInt(5, Integer.parseInt(bstep)+1);
+//			pstmt.setInt(6, Integer.parseInt(bindent)+1);
+//			
+//			//sql 문 완성
+//			
+//			pstmt.executeUpdate();//완성된 SQL문 실행
+//						
+//				
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} finally {
+//			try {				
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				}
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 	}
 	
-	public void reply_sort(String bgroup, String bstep) {
+	public void reply_sort(final String bgroup, final String bstep) {
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;		
+		String sql = "UPDATE mvc_board SET bstep=bstep+1 WHERE bgroup=? and bstep>?";
 		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "UPDATE mvc_board SET bstep=bstep+1 WHERE bgroup=? and bstep>?";
+		this.template.update(sql, new PreparedStatementSetter() {
 			
-			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
-			
-			pstmt.setString(1, bgroup);
-			pstmt.setString(2, bstep);
-			//sql 문 완성
-			
-			pstmt.executeUpdate();//완성된 SQL문 실행
-						
-				
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {				
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			@Override
+			public void setValues(PreparedStatement pstmt) throws SQLException {
+				// TODO Auto-generated method stub
+				pstmt.setString(1, bgroup);
+				pstmt.setString(2, bstep);
 			}
-		}
+		});
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;		
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "UPDATE mvc_board SET bstep=bstep+1 WHERE bgroup=? and bstep>?";
+//			
+//			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
+//			
+//			pstmt.setString(1, bgroup);
+//			pstmt.setString(2, bstep);
+//			//sql 문 완성
+//			
+//			pstmt.executeUpdate();//완성된 SQL문 실행
+//						
+//				
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} finally {
+//			try {				
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				}
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		
 	}
 
