@@ -15,6 +15,7 @@ import javax.sql.DataSource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 
 import com.gyojincompany.mvcboard.dto.BoardDto;
 import com.gyojincompany.mvcboard.util.Constant;
@@ -31,13 +32,13 @@ public class BoardDao {
 		
 		this.template = Constant.template;
 		
-//		try {
-//			Context context = new InitialContext();
-//			dataSource = (DataSource) context.lookup("java:comp/env/jdbc/Oracle11g");
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}		
+		try {
+			Context context = new InitialContext();
+			dataSource = (DataSource) context.lookup("java:comp/env/jdbc/Oracle11g");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 	}
 	
 	public ArrayList<BoardDto> list() { //게시판 전체 글 목록을 반환하는 메서드
@@ -171,94 +172,114 @@ public class BoardDao {
 		
 		upHit(cid);
 		
-		BoardDto dto = null;
+		String sql = "SELECT * FROM mvc_board WHERE bid=" + cid;
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
+		BoardDto dto = template.queryForObject(sql, new BeanPropertyRowMapper(BoardDto.class));
 		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "SELECT * FROM mvc_board WHERE bid=?";
-			//게시글 번호의 내림차순 정렬(최근글이 가장 위에 오도록 함)
-			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
-			pstmt.setString(1, cid);			
-			rs = pstmt.executeQuery();//SQL을 실행하여 결과값을 반환
-			
-			if(rs.next()) {
-				int bid = rs.getInt("bid");
-				String bname = rs.getString("bname");
-				String btitle = rs.getString("btitle");
-				String bcontent = rs.getString("bcontent");				
-				Timestamp bdate = rs.getTimestamp("bdate");
-				int bhit = rs.getInt("bhit");
-				int bgroup = rs.getInt("bgroup");
-				int bstep = rs.getInt("bstep");
-				int bindent = rs.getInt("bindent");
-				
-				dto = new BoardDto(bid, bname, btitle, bcontent, bdate, bhit, bgroup, bstep, bindent);
-								
-			}				
-				
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if(rs != null) {
-					rs.close();
-				}
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+//		BoardDto dto = null;
+//		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		ResultSet rs = null;
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "SELECT * FROM mvc_board WHERE bid=?";
+//			//게시글 번호의 내림차순 정렬(최근글이 가장 위에 오도록 함)
+//			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
+//			pstmt.setString(1, cid);			
+//			rs = pstmt.executeQuery();//SQL을 실행하여 결과값을 반환
+//			
+//			if(rs.next()) {
+//				int bid = rs.getInt("bid");
+//				String bname = rs.getString("bname");
+//				String btitle = rs.getString("btitle");
+//				String bcontent = rs.getString("bcontent");				
+//				Timestamp bdate = rs.getTimestamp("bdate");
+//				int bhit = rs.getInt("bhit");
+//				int bgroup = rs.getInt("bgroup");
+//				int bstep = rs.getInt("bstep");
+//				int bindent = rs.getInt("bindent");
+//				
+//				dto = new BoardDto(bid, bname, btitle, bcontent, bdate, bhit, bgroup, bstep, bindent);
+//								
+//			}				
+//				
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if(rs != null) {
+//					rs.close();
+//				}
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				}
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		
 		return dto;
 	}
 	
-	public void modify(String bname, String btitle, String bcontent, String bid) {
+	public void modify(final String bname, final String btitle, final String bcontent, final String bid) {
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;		
+		String sql = "UPDATE mvc_board SET bname=?, btitle=?, bcontent=? WHERE bid=?";
 		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "UPDATE mvc_board SET bname=?, btitle=?, bcontent=? WHERE bid=?";
+		this.template.update(sql, new PreparedStatementSetter() {
 			
-			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
-			
-			pstmt.setString(1, bname);
-			pstmt.setString(2, btitle);
-			pstmt.setString(3, bcontent);
-			pstmt.setString(4, bid);
-			//sql 문 완성
-			
-			pstmt.executeUpdate();//완성된 SQL문 실행
-						
+			@Override
+			public void setValues(PreparedStatement pstmt) throws SQLException {
+				// TODO Auto-generated method stub
 				
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {				
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				pstmt.setString(1, bname);
+				pstmt.setString(2, btitle);
+				pstmt.setString(3, bcontent);
+				pstmt.setString(4, bid);
+				
 			}
-		}
+		});
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;		
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "UPDATE mvc_board SET bname=?, btitle=?, bcontent=? WHERE bid=?";
+//			
+//			pstmt = conn.prepareStatement(sql);//sql문 객체 생성
+//			
+//			pstmt.setString(1, bname);
+//			pstmt.setString(2, btitle);
+//			pstmt.setString(3, bcontent);
+//			pstmt.setString(4, bid);
+//			//sql 문 완성
+//			
+//			pstmt.executeUpdate();//완성된 SQL문 실행
+//						
+//				
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} finally {
+//			try {				
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				}
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		
 	}
 	
